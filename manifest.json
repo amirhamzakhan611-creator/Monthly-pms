@@ -1,0 +1,59 @@
+{
+  "name": "PMS Tracker — DPI West 1",
+  "short_name": "PMS Tracker",
+  "description": "Preventive Maintenance Schedule Tracker for Jubilant FoodWorks DPI West 1 Mumbai",
+  "start_url": "/Monthly-pms/",
+  "scope": "/Monthly-pms/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1117",
+  "theme_color": "#f78166",
+  "lang": "en-IN",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Cycle 1 (1-15)",
+      "short_name": "Cycle 1",
+      "url": "/Monthly-pms/?cycle=1",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Cycle 2 (16-31)",
+      "short_name": "Cycle 2",
+      "url": "/Monthly-pms/?cycle=2",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
