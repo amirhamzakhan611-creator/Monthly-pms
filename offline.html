@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offline — PMS Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&family=Noto+Sans:wght@400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Noto Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  .icon {
+    font-size: 72px;
+    margin-bottom: 20px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.6; transform: scale(0.95); }
+  }
+  h1 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #f78166;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  p {
+    color: #7d8590;
+    font-size: 15px;
+    line-height: 1.6;
+    max-width: 300px;
+    margin: 0 auto 24px;
+  }
+  .good-news {
+    background: #1c2230;
+    border: 1px solid #2a3448;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    max-width: 320px;
+  }
+  .good-news-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    color: #3fb950;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .good-news p {
+    font-size: 13px;
+    color: #7d8590;
+    margin: 0;
+  }
+  .retry-btn {
+    background: #f78166;
+    color: #0d1117;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 32px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+  <div class="icon">📶</div>
+  <h1>YOU'RE OFFLINE</h1>
+  <p>Internet connection nahi hai. Thoda wait karo ya WiFi check karo.</p>
+
+  <div class="good-news">
+    <div class="good-news-title">✅ Good News!</div>
+    <p>PMS Tracker app aapke phone mein cached hai. Internet aane par main page automatically open hoga. Aapka saara data <strong>safe</strong> hai — localStorage mein stored hai.</p>
+  </div>
+
+  <button class="retry-btn" onclick="window.location.href='/'">🔄 Retry</button>
+</body>
+</html>

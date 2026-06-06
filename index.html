@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f78166">
+<meta name="description" content="PMS Ticket Tracker — DPI West 1, Mumbai. Track Preventive Maintenance Schedule compliance across 6 stores.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PMS Tracker">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Icons -->
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.json">
+
+<title>PMS Tracker — DPI West 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Noto+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg:      #0d1117;
+  --surface: #161b22;
+  --card:    #1c2230;
+  --border:  #2a3448;
+  --accent:  #f78166;
+  --green:   #3fb950;
+  --orange:  #e3a12f;
+  --blue:    #58a6ff;
+  --text:    #e6edf3;
+  --muted:   #7d8590;
+  --danger:  #f85149;
+  --wa:      #25D366;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 60px;
+  overscroll-behavior: none;
+}
+
+/* ── INSTALL BANNER ── */
+#install-banner {
+  display: none;
+  background: linear-gradient(135deg, #1a2035, #1c2230);
+  border-bottom: 1px solid var(--accent);
+  padding: 10px 16px;
+  align-items: center;
+  gap: 10px;
+}
+#install-banner p { flex: 1; font-size: 13px; color: var(--text); }
+#install-banner p span { color: var(--accent); font-weight: 600; }
+.install-btn {
+  background: var(--accent);
+  color: #0d1117;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dismiss-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(135deg, #0d1117 0%, #1a2035 100%);
+  border-bottom: 2px solid var(--accent);
+  padding: 14px 16px 10px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.logo { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 1px; }
+.logo span { color: var(--accent); }
+.version { font-family: 'Share Tech Mono', monospace; font-size: 10px; color: var(--muted); }
+#live-clock { font-family: 'Share Tech Mono', monospace; font-size: 13px; color: var(--accent); }
+#live-date  { font-size: 10px; color: var(--muted); text-align: right; }
+
+/* offline dot */
+.status-dot {
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--green);
+  margin-right: 4px;
+  vertical-align: middle;
+}
+.status-dot.offline { background: var(--danger); }
+
+.cycle-bar {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.cycle-bar::-webkit-scrollbar { display: none; }
+.cycle-bar label { display: block; font-size: 10px; color: var(--muted); margin-bottom: 3px; font-family: 'Share Tech Mono', monospace; }
+.cycle-bar select, .cycle-bar input {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  -webkit-appearance: none;
+}
+#sel-month { width: 110px; }
+#sel-year  { width: 70px; }
+#sel-cycle { width: 130px; }
+
+/* ── SUMMARY ── */
+.summary {
+  margin: 12px 16px 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+.summary-title {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.s-val { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 700; }
+.s-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.s-val.cv-total  { color: var(--blue); }
+.s-val.cv-closed { color: var(--green); }
+.s-val.cv-open   { color: var(--orange); }
+.s-val.cv-pct    { color: var(--accent); }
+.master-bar  { background: var(--border); border-radius: 99px; height: 8px; overflow: hidden; }
+.master-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--green), #7ee787); transition: width .6s ease; }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 10px 16px 4px;
+}
+
+/* ── STORE CARDS ── */
+.store-card {
+  margin: 8px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.store-card:focus-within { border-color: var(--blue); }
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.store-num {
+  background: var(--accent);
+  color: #0d1117;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.store-name-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  outline: none;
+  min-width: 0;
+}
+.store-name-input::placeholder { color: var(--muted); }
+.store-pct-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.badge-good { background: rgba(63,185,80,0.15);  color: var(--green); }
+.badge-mid  { background: rgba(227,161,47,0.15); color: var(--orange); }
+.badge-low  { background: rgba(248,81,73,0.15);  color: var(--danger); }
+.badge-zero { background: var(--border);          color: var(--muted); }
+
+.card-body { padding: 12px 12px 10px; }
+.inputs-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.inp-group label {
+  display: block;
+  font-size: 9px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 4px;
+  font-family: 'Share Tech Mono', monospace;
+}
+.inp-group input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 6px;
+  border-radius: 8px;
+  font-size: 22px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  transition: border-color .2s;
+  -webkit-appearance: none;
+}
+.inp-group input:focus { border-color: var(--blue); }
+.closed-inp { color: var(--green) !important; }
+.open-inp   { color: var(--orange) !important; }
+
+.derived-row {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.d-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: center;
+  padding: 6px 4px;
+}
+.d-val { font-family: 'Rajdhani', sans-serif; font-size: 16px; font-weight: 700; }
+.d-lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.dv-total  { color: var(--blue); }
+.dv-closed { color: var(--green); }
+.dv-open   { color: var(--orange); }
+
+.prog-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.prog-track { background: var(--border); border-radius: 99px; height: 5px; overflow: hidden; }
+.prog-fill  { height: 100%; border-radius: 99px; transition: width .5s ease; }
+.fill-good  { background: linear-gradient(90deg,#3fb950,#7ee787); }
+.fill-mid   { background: linear-gradient(90deg,#e3a12f,#f0c060); }
+.fill-low   { background: linear-gradient(90deg,#f85149,#ff7b72); }
+
+/* ── WHATSAPP ── */
+.wa-section { margin: 14px 16px 6px; }
+.wa-btn {
+  width: 100%;
+  background: var(--wa);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 13px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-transform: uppercase;
+  transition: opacity .2s;
+}
+.wa-btn:active { opacity: 0.85; }
+.wa-preview {
+  margin-top: 12px;
+  background: #0a1a10;
+  border: 1px solid #1e4d2b;
+  border-radius: 12px;
+  padding: 14px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #b5e4c0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  display: none;
+}
+.copy-btn {
+  width: 100%;
+  margin-top: 8px;
+  background: var(--surface);
+  border: 1px solid var(--wa);
+  color: var(--wa);
+  border-radius: 10px;
+  padding: 11px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.copy-btn:active { background: #1a3d25; }
+
+/* ── RESET ROW ── */
+.reset-row { margin: 8px 16px; display: flex; gap: 8px; }
+.reset-btn {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 9px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.reset-btn.danger { border-color: rgba(248,81,73,0.3); color: var(--danger); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--green);
+  color: #0d1117;
+  padding: 10px 22px;
+  border-radius: 99px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  transition: transform .3s ease;
+  z-index: 999;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ── FOOTER ── */
+.footer { text-align: center; padding: 16px; font-size: 10px; color: var(--muted); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+
+/* ── UPDATE BANNER ── */
+#update-banner {
+  display: none;
+  background: #1c2230;
+  border: 1px solid var(--blue);
+  border-radius: 10px;
+  margin: 8px 16px;
+  padding: 10px 14px;
+  font-size: 13px;
+  align-items: center;
+  gap: 10px;
+}
+#update-banner p { flex: 1; color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- INSTALL BANNER -->
+<div id="install-banner">
+  <p>📲 <span>Home Screen pe add karo</span> — Offline bhi chalega!</p>
+  <button class="install-btn" id="install-btn">Install</button>
+  <button class="dismiss-btn" id="dismiss-btn">✕</button>
+</div>
+
+<!-- UPDATE BANNER -->
+<div id="update-banner">
+  <p>🔄 New version available!</p>
+  <button class="install-btn" onclick="updateApp()">Update</button>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="logo">PMS <span>TRACKER</span></div>
+      <div class="version">
+        <span class="status-dot" id="status-dot"></span>
+        DPI WEST 1 · MUMBAI
+      </div>
+    </div>
+    <div>
+      <div id="live-clock"></div>
+      <div id="live-date"></div>
+    </div>
+  </div>
+  <div class="cycle-bar">
+    <div>
+      <label>MONTH</label>
+      <select id="sel-month">
+        <option>January</option><option>February</option><option>March</option>
+        <option>April</option><option>May</option><option>June</option>
+        <option>July</option><option>August</option><option>September</option>
+        <option>October</option><option>November</option><option>December</option>
+      </select>
+    </div>
+    <div>
+      <label>YEAR</label>
+      <input type="number" id="sel-year" value="2026" min="2024" max="2030">
+    </div>
+    <div>
+      <label>CYCLE</label>
+      <select id="sel-cycle">
+        <option value="1">Cycle 1 (1–15)</option>
+        <option value="2">Cycle 2 (16–31)</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<!-- SUMMARY -->
+<div class="summary">
+  <div class="summary-title">📊 Overall — All 6 Stores</div>
+  <div class="summary-grid">
+    <div><div class="s-val cv-total"  id="sum-total">0</div><div class="s-lbl">Total</div></div>
+    <div><div class="s-val cv-closed" id="sum-closed">0</div><div class="s-lbl">Closed</div></div>
+    <div><div class="s-val cv-open"   id="sum-open">0</div><div class="s-lbl">Open</div></div>
+    <div><div class="s-val cv-pct"    id="sum-pct">0%</div><div class="s-lbl">Compliant</div></div>
+  </div>
+  <div class="master-bar"><div class="master-fill" id="master-fill" style="width:0%"></div></div>
+</div>
+
+<div class="section-label">// 6 STORE PMS TICKET ENTRIES</div>
+
+<!-- STORE CARDS -->
+<div id="stores-container"></div>
+
+<!-- WHATSAPP REPORT -->
+<div class="wa-section">
+  <button class="wa-btn" onclick="generateWA()">
+    <svg width="19" height="19" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    Generate WhatsApp Report
+  </button>
+  <div class="wa-preview" id="wa-preview"></div>
+  <button class="copy-btn" id="copy-btn" onclick="copyWA()">📋 Copy to Clipboard</button>
+</div>
+
+<!-- RESET -->
+<div class="reset-row">
+  <button class="reset-btn" onclick="resetCycle()">🔄 Reset This Cycle</button>
+  <button class="reset-btn danger" onclick="resetAll()">⚠️ Reset All</button>
+</div>
+
+<div class="footer">
+  PWA v1.0 · AUTO SAVED · WORKS OFFLINE<br>
+  Amir Khan · Sr. Technician · DPI West 1
+</div>
+
+<div class="toast" id="toast">✓ Done!</div>
+
+<script>
+// ─── CONSTANTS ───
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DEFAULT_STORES = [
+  'Kurla Shelter — DPI64519',
+  'IIT Powai — DPI64277',
+  'Huma Mall — DPI63831',
+  'Ghatkopar West — DPI64734',
+  'Vikhroli West — DPI66020',
+  'Store 6 — DPI Code'
+];
+
+// ─── SERVICE WORKER ───
+let swReg;
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      swReg = reg;
+      reg.addEventListener('updatefound', () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            document.getElementById('update-banner').style.display = 'flex';
+          }
+        });
+      });
+    }).catch(err => console.warn('[PWA] SW registration failed:', err));
+  });
+}
+function updateApp() {
+  if (swReg && swReg.waiting) {
+    swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
+  }
+  window.location.reload();
+}
+
+// ─── INSTALL PROMPT ───
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!localStorage.getItem('pms_install_dismissed')) {
+    document.getElementById('install-banner').style.display = 'flex';
+  }
+});
+document.getElementById('install-btn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') showToast('✅ App Installed!');
+  deferredPrompt = null;
+  document.getElementById('install-banner').style.display = 'none';
+});
+document.getElementById('dismiss-btn').addEventListener('click', () => {
+  document.getElementById('install-banner').style.display = 'none';
+  localStorage.setItem('pms_install_dismissed', '1');
+});
+
+// ─── ONLINE STATUS ───
+const dot = document.getElementById('status-dot');
+function updateOnlineStatus() {
+  dot.className = 'status-dot' + (navigator.onLine ? '' : ' offline');
+}
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', () => { updateOnlineStatus(); showToast('📶 Offline Mode', '#e3a12f'); });
+updateOnlineStatus();
+
+// ─── CLOCK ───
+function updateClock() {
+  const n = new Date();
+  document.getElementById('live-clock').textContent = n.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.getElementById('live-date').textContent  = n.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── INIT MONTH/CYCLE FROM URL ───
+const urlParams = new URLSearchParams(window.location.search);
+document.getElementById('sel-month').value = MONTHS[new Date().getMonth()];
+document.getElementById('sel-year').value  = new Date().getFullYear();
+if (urlParams.get('cycle')) document.getElementById('sel-cycle').value = urlParams.get('cycle');
+
+// ─── STORAGE KEY ───
+function getCycleKey() {
+  return `pms_${document.getElementById('sel-year').value}_${document.getElementById('sel-month').value}_C${document.getElementById('sel-cycle').value}`;
+}
+
+function saveData() {
+  const stores = [];
+  for (let i = 0; i < 6; i++) {
+    stores.push({
+      name:   document.getElementById(`sname-${i}`).value,
+      closed: parseInt(document.getElementById(`closed-${i}`).value) || 0,
+      open:   parseInt(document.getElementById(`open-${i}`).value)   || 0,
+    });
+  }
+  localStorage.setItem(getCycleKey(), JSON.stringify({ stores, ts: Date.now() }));
+}
+
+function loadData() {
+  const raw = localStorage.getItem(getCycleKey());
+  return raw ? JSON.parse(raw) : null;
+}
+
+// ─── BUILD CARDS ───
+function buildCards() {
+  const c = document.getElementById('stores-container');
+  c.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    c.innerHTML += `
+    <div class="store-card" id="card-${i}">
+      <div class="card-header">
+        <div class="store-num">${i+1}</div>
+        <input class="store-name-input" id="sname-${i}" placeholder="Store Name / DPI Code" oninput="saveData()">
+        <div class="store-pct-badge badge-zero" id="badge-${i}">—</div>
+      </div>
+      <div class="card-body">
+        <div class="inputs-row">
+          <div class="inp-group">
+            <label>✅ Closed / Resolved</label>
+            <input type="number" id="closed-${i}" class="closed-inp" placeholder="0" min="0"
+                   inputmode="numeric" oninput="onInput(${i})">
+          </div>
+          <div class="inp-group">
+            <label>🔴 Open / Active</label>
+            <input type="number" id="open-${i}" class="open-inp" placeholder="0" min="0"
+                   inputmode="numeric" oninput="onInput(${i})">
+          </div>
+        </div>
+        <div class="derived-row">
+          <div class="d-box">
+            <div class="d-val dv-total" id="dtotal-${i}">0</div>
+            <div class="d-lbl">Total</div>
+          </div>
+          <div class="d-box">
+            <div class="d-val dv-closed" id="dclosed-${i}">—</div>
+            <div class="d-lbl">Closed %</div>
+          </div>
+          <div class="d-box">
+            <div class="d-val dv-open" id="dopen-${i}">—</div>
+            <div class="d-lbl">Open %</div>
+          </div>
+        </div>
+        <div class="prog-label">
+          <span>PMS Compliance</span>
+          <span id="prog-pct-${i}">0%</span>
+        </div>
+        <div class="prog-track">
+          <div class="prog-fill fill-low" id="prog-${i}" style="width:0%"></div>
+        </div>
+      </div>
+    </div>`;
+  }
+}
+
+// ─── ON INPUT ───
+function onInput(i) {
+  const cl  = parseInt(document.getElementById(`closed-${i}`).value) || 0;
+  const op  = parseInt(document.getElementById(`open-${i}`).value)   || 0;
+  const tot = cl + op;
+  const pct = tot > 0 ? Math.round((cl / tot) * 100) : 0;
+
+  document.getElementById(`dtotal-${i}`).textContent  = tot;
+  document.getElementById(`dclosed-${i}`).textContent = tot > 0 ? pct + '%' : '—';
+  document.getElementById(`dopen-${i}`).textContent   = tot > 0 ? (100 - pct) + '%' : '—';
+  document.getElementById(`prog-pct-${i}`).textContent = pct + '%';
+
+  const bar   = document.getElementById(`prog-${i}`);
+  const badge = document.getElementById(`badge-${i}`);
+  bar.style.width = pct + '%';
+  bar.className   = 'prog-fill ' + (pct >= 75 ? 'fill-good' : pct >= 50 ? 'fill-mid' : 'fill-low');
+
+  if (tot === 0) {
+    badge.textContent = '—';
+    badge.className = 'store-pct-badge badge-zero';
+  } else {
+    badge.textContent = pct + '%';
+    badge.className   = 'store-pct-badge ' + (pct >= 75 ? 'badge-good' : pct >= 50 ? 'badge-mid' : 'badge-low');
+  }
+
+  updateSummary();
+  saveData();
+}
+
+function updateSummary() {
+  let tT = 0, tC = 0, tO = 0;
+  for (let i = 0; i < 6; i++) {
+    tC += parseInt(document.getElementById(`closed-${i}`).value) || 0;
+    tO += parseInt(document.getElementById(`open-${i}`).value)   || 0;
+  }
+  tT = tC + tO;
+  const pct = tT > 0 ? Math.round((tC / tT) * 100) : 0;
+  document.getElementById('sum-total').textContent  = tT;
+  document.getElementById('sum-closed').textContent = tC;
+  document.getElementById('sum-open').textContent   = tO;
+  document.getElementById('sum-pct').textContent    = pct + '%';
+  document.getElementById('master-fill').style.width = pct + '%';
+}
+
+// ─── POPULATE FROM STORAGE ───
+function populateFields() {
+  const data = loadData();
+  for (let i = 0; i < 6; i++) {
+    const s = data?.stores?.[i];
+    document.getElementById(`sname-${i}`).value  = s?.name   ?? DEFAULT_STORES[i];
+    document.getElementById(`closed-${i}`).value = s?.closed || '';
+    document.getElementById(`open-${i}`).value   = s?.open   || '';
+    onInput(i);
+  }
+}
+
+// ─── CYCLE CHANGE ───
+['sel-month','sel-year','sel-cycle'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    for (let i = 0; i < 6; i++) {
+      document.getElementById(`closed-${i}`).value = '';
+      document.getElementById(`open-${i}`).value   = '';
+    }
+    populateFields();
+    document.getElementById('wa-preview').style.display = 'none';
+    document.getElementById('copy-btn').style.display   = 'none';
+  });
+});
+
+// ─── WHATSAPP GENERATOR ───
+function generateWA() {
+  const month = document.getElementById('sel-month').value;
+  const year  = document.getElementById('sel-year').value;
+  const cycle = document.getElementById('sel-cycle').value;
+  const range = cycle === '1' ? '01–15' : '16–31';
+  const now   = new Date();
+  const ds    = now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+  const ts    = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+
+  let tT = 0, tC = 0, tO = 0;
+  const lines = [
+    `🔧 *PMS COMPLIANCE REPORT*`,
+    `📅 ${month} ${year} | Cycle ${cycle} (${range})`,
+    `🕐 ${ds}, ${ts}`,
+    `👤 Amir Khan | Sr. Technician | DPI West 1`,
+    `${'─'.repeat(32)}`
+  ];
+
+  for (let i = 0; i < 6; i++) {
+    const name  = document.getElementById(`sname-${i}`).value.trim() || `Store ${i+1}`;
+    const cl    = parseInt(document.getElementById(`closed-${i}`).value) || 0;
+    const op    = parseInt(document.getElementById(`open-${i}`).value)   || 0;
+    const tot   = cl + op;
+    const pct   = tot > 0 ? Math.round((cl / tot) * 100) : 0;
+    tC += cl; tO += op; tT += tot;
+
+    const em  = pct >= 75 ? '✅' : pct >= 50 ? '⚠️' : tot === 0 ? '⬜' : '🔴';
+    const bar = '█'.repeat(Math.round(pct/10)) + '░'.repeat(10 - Math.round(pct/10));
+
+    lines.push('');
+    lines.push(`${em} *${name}*`);
+    lines.push(`   Total: ${tot}  |  ✔ Closed: ${cl}  |  🔴 Open: ${op}`);
+    lines.push(`   ${bar} ${pct}%`);
+  }
+
+  const overallPct = tT > 0 ? Math.round((tC / tT) * 100) : 0;
+  const grade = overallPct >= 80 ? '🏆 EXCELLENT' : overallPct >= 60 ? '👍 GOOD' : overallPct >= 40 ? '⚠️ AVERAGE' : '🔴 NEEDS ATTENTION';
+
+  lines.push('');
+  lines.push(`${'─'.repeat(32)}`);
+  lines.push(`📊 *OVERALL SUMMARY*`);
+  lines.push(`   Total Tickets  : ${tT}`);
+  lines.push(`   ✅ Resolved    : ${tC} *(${overallPct}%)*`);
+  lines.push(`   🔴 Active      : ${tO} *(${tT > 0 ? 100 - overallPct : 0}%)*`);
+  lines.push(`   Status         : *${grade}*`);
+  lines.push(`${'─'.repeat(32)}`);
+  lines.push(`_PMS Tracker App · DPI West 1_`);
+
+  const msg = lines.join('\n');
+  const preview = document.getElementById('wa-preview');
+  const copyBtn = document.getElementById('copy-btn');
+  preview.textContent = msg;
+  preview._msg = msg;
+  preview.style.display = 'block';
+  copyBtn.style.display = 'flex';
+  preview.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyWA() {
+  const msg = document.getElementById('wa-preview')._msg || '';
+  navigator.clipboard.writeText(msg).then(() => showToast('✓ Copied!')).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = msg;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('✓ Copied!');
+  });
+}
+
+// ─── RESET ───
+function resetCycle() {
+  if (!confirm(`${document.getElementById('sel-month').value} Cycle ${document.getElementById('sel-cycle').value} ka data reset karna hai?`)) return;
+  localStorage.removeItem(getCycleKey());
+  for (let i = 0; i < 6; i++) {
+    document.getElementById(`closed-${i}`).value = '';
+    document.getElementById(`open-${i}`).value   = '';
+    onInput(i);
+  }
+  showToast('🔄 Cycle Reset Done');
+}
+function resetAll() {
+  if (!confirm('⚠️ Saara PMS data delete ho jayega! Confirm?')) return;
+  Object.keys(localStorage).filter(k => k.startsWith('pms_')).forEach(k => localStorage.removeItem(k));
+  for (let i = 0; i < 6; i++) {
+    document.getElementById(`sname-${i}`).value  = DEFAULT_STORES[i];
+    document.getElementById(`closed-${i}`).value = '';
+    document.getElementById(`open-${i}`).value   = '';
+    onInput(i);
+  }
+  showToast('⚠️ All Data Cleared', '#f85149');
+}
+
+// ─── TOAST ───
+let toastTimer;
+function showToast(msg, color = '#3fb950') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── INIT ───
+buildCards();
+populateFields();
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#0d1117"/>
+  <!-- Orange accent ring -->
+  <rect width="512" height="512" rx="80" fill="none" stroke="#f78166" stroke-width="16"/>
+
+  <!-- Wrench icon (left) -->
+  <g transform="translate(80, 140)">
+    <path d="M 60 0 C 27 0 0 27 0 60 C 0 93 27 120 60 120 C 73 120 85 115 94 107 L 210 223 C 218 231 228 235 238 235 C 258 235 275 218 275 198 C 275 188 271 178 263 170 L 147 54 C 155 45 160 33 160 20 C 160 9 156 -1 150 -8 L 110 32 L 90 12 L 130 -28 C 107 -37 80 -30 60 0 Z"
+          fill="#f78166" transform="scale(0.55) translate(0,30)"/>
+  </g>
+
+  <!-- "PMS" text -->
+  <text x="256" y="280"
+        font-family="Arial, sans-serif"
+        font-size="110"
+        font-weight="900"
+        fill="#e6edf3"
+        text-anchor="middle"
+        letter-spacing="6">PMS</text>
+
+  <!-- Subtitle bar -->
+  <rect x="96" y="310" width="320" height="4" rx="2" fill="#f78166" opacity="0.6"/>
+
+  <!-- "TRACKER" text -->
+  <text x="256" y="370"
+        font-family="Arial, sans-serif"
+        font-size="52"
+        font-weight="700"
+        fill="#7d8590"
+        text-anchor="middle"
+        letter-spacing="10">TRACKER</text>
+
+  <!-- Bottom dots (cycle indicator) -->
+  <circle cx="196" cy="420" r="12" fill="#3fb950"/>
+  <circle cx="236" cy="420" r="12" fill="#f78166"/>
+  <circle cx="276" cy="420" r="12" fill="#e3a12f"/>
+  <circle cx="316" cy="420" r="12" fill="#58a6ff"/>
+</svg>
